@@ -2,33 +2,36 @@ package com.donboots.codepathtodo;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class EditItemsActivity extends Activity {
-    String todo;
-    int todoPosition;
-    EditText txtTodo;
+    String todoLabel;
+    String todoId;
+    EditText txtLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_items);
 
-        txtTodo = (EditText) findViewById(R.id.txtTodo);
+        txtLabel = (EditText) findViewById(R.id.txtLabel);
 
-        todo = getIntent().getStringExtra("todo");
-        todoPosition = getIntent().getIntExtra("todoPosition", -1);
-        txtTodo.setText(todo);
+        Bundle bundle = getIntent().getExtras();
+        todoLabel = bundle.getString("todoLabel");
+        todoId = bundle.getString("todoId");
+
+        txtLabel.setText(todoLabel);
     }
 
     public void onSave(View view) {
+        Bundle bundle = new Bundle();
+        bundle.putString("todoLabel", txtLabel.getText().toString());
+        bundle.putString("todoId", todoId);
+
         Intent i = new Intent(EditItemsActivity.this, MainActivity.class);
-        i.putExtra("todo", txtTodo.getText().toString());
-        i.putExtra("todoPosition", todoPosition);
+        i.putExtras(bundle);
         startActivityForResult(i, 99);
         finish();
     }

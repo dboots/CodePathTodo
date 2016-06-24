@@ -1,45 +1,66 @@
 package com.donboots.codepathtodo;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import android.widget.SimpleCursorAdapter;
 
 public class MainActivity extends Activity {
-    ArrayList<String> todoItems;
-    ArrayAdapter<String> todoAdapter;
+    final String FIRST_RUN = "firstRun";
+    final String DATABASE = "Todo";
+    final String TBL_TODO = "TodoItems";
+
     ListView lvItems;
-    EditText txtAdd;
+    EditText txtLabel;
+
+    SQLiteDatabase db;
+    SimpleCursorAdapter cursorAdapter;
+
+    //-- PreferenceManager to get/set FIRST_RUN bool
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lvItems = (ListView) findViewById(R.id.lvItems);
-        txtAdd = (EditText) findViewById(R.id.txtAdd);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        db = openOrCreateDatabase(DATABASE, MODE_PRIVATE, null);
 
-        populateTodoItems();
+
+        //-- If it is the first time being run, create TBL_TODO (Id, Label) table
+        if(!prefs.getBoolean(FIRST_RUN, false)) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean(FIRST_RUN, true);
+            editor.commit();
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_TODO + "(_id INTEGER PRIMARY KEY, Label VARCHAR);");
+        }
+
+        lvItems = (ListView) findViewById(R.id.lvItems);
+        txtLabel = (EditText) findViewById(R.id.txtLabel);
+
+        readItems();
         handleExtras();
 
-        lvItems.setAdapter(todoAdapter);
+        lvItems.setAdapter(cursorAdapter);
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                todoItems.remove(position);
-                todoAdapter.notifyDataSetChanged();
-                writeItems();
+                Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+                String todoId = cursor.getString(cursor.getColumnIndex("_id"));
+                db.delete(TBL_TODO, "_id=" + todoId, null);
+                readItems();
                 return true;
             };
         });
@@ -47,55 +68,60 @@ public class MainActivity extends Activity {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+                String todoId = cursor.getString(cursor.getColumnIndex("_id"));
+                String todoLabel = cursor.getString(cursor.getColumnIndex("Label"));
+
+                Bundle bundle = new Bundle();
+                bundle.putString("todoId", todoId);
+                bundle.putString("todoLabel", todoLabel);
+
                 Intent i = new Intent(MainActivity.this, EditItemsActivity.class);
-                i.putExtra("todo", todoItems.get(position).toString());
-                i.putExtra("todoPosition", position);
+                i.putExtras(bundle);
+
                 startActivity(i);
             };
         });
     }
 
     private void handleExtras() {
-        String todo = getIntent().getStringExtra("todo");
-        int todoPosition = getIntent().getIntExtra("todoPosition", -1);
+        Bundle bundle = getIntent().getExtras();
+        String todoLabel = bundle.getString("todoLabel");
+        String todoId = bundle.getString("todoId");
+        ContentValues values = new ContentValues();
+        values.put("Label", todoLabel);
 
-        if (todoPosition > -1) {
-            todoItems.set(todoPosition, todo);
-            writeItems();
-        }
-    }
-    
-    private void populateTodoItems() {
+        db.update(TBL_TODO, values, "_id=" + todoId, null);
         readItems();
-        todoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todoItems);
-        todoAdapter.setNotifyOnChange(true);
-    }
-
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-
-        try {
-            FileUtils.writeLines(file, todoItems);
-        } catch (IOException e) {
-
-        }
     }
 
     private void readItems() {
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
+        Cursor rs = db.rawQuery("SELECT * FROM " + TBL_TODO, null);
+        rs.moveToFirst();
 
-        try {
-            todoItems = new ArrayList<String>(FileUtils.readLines(file));
-        } catch (IOException e) {
-            todoItems = new ArrayList<String>();
-        }
+        String[] columns = new String[] {
+                "Label"
+        };
+
+        int[] to = new int[] {
+                android.R.id.text1
+        };
+
+        cursorAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, rs, columns, to, 0);
+
+        cursorAdapter.changeCursor(rs);
+        lvItems.setAdapter(cursorAdapter);
     }
 
     public void onAddItem(View view) {
-        todoItems.add(txtAdd.getText().toString());
-        txtAdd.setText("");
-        writeItems();
+        String label = txtLabel.getText().toString();
+        ContentValues values = new ContentValues();
+        values.put("Label", label);
+
+        db.insert(TBL_TODO, null, values);
+
+        readItems();
+
+        txtLabel.setText("");
     }
 }

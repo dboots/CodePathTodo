@@ -22,18 +22,17 @@
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/txtTodo"
+        android:id="@+id/txtLabel"
         android:layout_below="@+id/textView"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:text="123" />
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
         android:id="@+id/btnSave"
-        android:layout_below="@+id/txtTodo"
+        android:layout_below="@+id/txtLabel"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:onClick="onSave" />

@@ -31,7 +31,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/txtAdd"
+        android:id="@+id/txtLabel"
         android:hint="@string/add_item"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
