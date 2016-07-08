@@ -1,45 +1,43 @@
 package com.donboots.codepathtodo;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class MainActivity extends Activity {
-    ArrayList<String> todoItems;
-    ArrayAdapter<String> todoAdapter;
     ListView lvItems;
-    EditText txtAdd;
+    TodoAdapter todoAdapter;
+
+    //-- PreferenceManager to get/set FIRST_RUN bool
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        todoAdapter = new TodoAdapter(this);
         lvItems = (ListView) findViewById(R.id.lvItems);
-        txtAdd = (EditText) findViewById(R.id.txtAdd);
 
-        populateTodoItems();
-        handleExtras();
+        readItems();
 
         lvItems.setAdapter(todoAdapter);
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                todoItems.remove(position);
+                Todo todo = todoAdapter.getItem(position);
+
+                todo.delete();
                 todoAdapter.notifyDataSetChanged();
-                writeItems();
+
+                readItems();
                 return true;
             };
         });
@@ -47,55 +45,26 @@ public class MainActivity extends Activity {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Todo todo = todoAdapter.getItem(position);
+
+                Bundle bundle = new Bundle();
+                bundle.putLong("todoId", todo.getId());
+
                 Intent i = new Intent(MainActivity.this, EditItemsActivity.class);
-                i.putExtra("todo", todoItems.get(position).toString());
-                i.putExtra("todoPosition", position);
+                i.putExtras(bundle);
+
                 startActivity(i);
             };
         });
     }
 
-    private void handleExtras() {
-        String todo = getIntent().getStringExtra("todo");
-        int todoPosition = getIntent().getIntExtra("todoPosition", -1);
-
-        if (todoPosition > -1) {
-            todoItems.set(todoPosition, todo);
-            writeItems();
-        }
-    }
-    
-    private void populateTodoItems() {
-        readItems();
-        todoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todoItems);
-        todoAdapter.setNotifyOnChange(true);
-    }
-
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-
-        try {
-            FileUtils.writeLines(file, todoItems);
-        } catch (IOException e) {
-
-        }
-    }
-
     private void readItems() {
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-
-        try {
-            todoItems = new ArrayList<String>(FileUtils.readLines(file));
-        } catch (IOException e) {
-            todoItems = new ArrayList<String>();
-        }
+        todoAdapter.notifyDataSetChanged();
+        todoAdapter.setData(Todo.listAll(Todo.class));
     }
 
     public void onAddItem(View view) {
-        todoItems.add(txtAdd.getText().toString());
-        txtAdd.setText("");
-        writeItems();
+        Intent i = new Intent(MainActivity.this, EditItemsActivity.class);
+        startActivity(i);
     }
 }
