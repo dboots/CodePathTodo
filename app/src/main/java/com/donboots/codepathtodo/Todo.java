@@ -4,14 +4,12 @@ import com.orm.SugarRecord;
 
 public class Todo extends SugarRecord {
     String label;
+    String date;
 
     public Todo() { }
 
-    public Todo(String label) {
+    public Todo(String label, String date) {
         this.label = label;
-    }
-
-    public String toString() {
-        return this.label;
+        this.date = date;
     }
 }

@@ -13,17 +13,38 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Edit Item Below:"
-        android:id="@+id/textView"
+        android:text="@string/add_item_label"
+        android:id="@+id/tvLabel"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:hint="@string/add_item_label" />
 
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/txtLabel"
-        android:layout_below="@+id/textView"
+        android:id="@+id/etLabel"
+        android:layout_below="@+id/tvLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Todo Date"
+        android:id="@+id/tvDate"
+        android:layout_below="@+id/etLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="date"
+        android:ems="10"
+        android:id="@+id/etDate"
+        android:layout_below="@+id/tvDate"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -32,8 +53,9 @@
         android:layout_height="wrap_content"
         android:text="Save"
         android:id="@+id/btnSave"
-        android:layout_below="@+id/txtLabel"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="onSave" />
+        android:onClick="onSave"
+        android:layout_below="@+id/etDate"
+        android:layout_centerHorizontal="true" />
+
+
 </RelativeLayout>

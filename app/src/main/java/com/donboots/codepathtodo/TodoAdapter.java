@@ -54,18 +54,18 @@ public class TodoAdapter extends BaseAdapter {
         Todo todo = getItem(position);
 
         holder.label.setText(todo.label);
-        holder.position.setText(todo.getId().toString());
+        holder.date.setText(todo.date);
 
         return convertView;
     }
 
     private class ViewHolder {
         TextView label;
-        TextView position;
+        TextView date;
 
         public ViewHolder(View view) {
-            label = (TextView) view.findViewById(R.id.txtLabel);
-            position = (TextView) view.findViewById(R.id.txtPosition);
+            label = (TextView) view.findViewById(R.id.etLabel);
+            date = (TextView) view.findViewById(R.id.etDate);
         }
 
     }

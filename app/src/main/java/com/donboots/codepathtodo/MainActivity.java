@@ -13,8 +13,6 @@ import android.widget.ListView;
 
 public class MainActivity extends Activity {
     ListView lvItems;
-    EditText txtLabel;
-
     TodoAdapter todoAdapter;
 
     //-- PreferenceManager to get/set FIRST_RUN bool
@@ -26,9 +24,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         todoAdapter = new TodoAdapter(this);
-
         lvItems = (ListView) findViewById(R.id.lvItems);
-        txtLabel = (EditText) findViewById(R.id.txtLabel);
 
         readItems();
 
@@ -68,13 +64,7 @@ public class MainActivity extends Activity {
     }
 
     public void onAddItem(View view) {
-        String label = txtLabel.getText().toString();
-
-        Todo todo = new Todo(label);
-        todo.save();
-
-        readItems();
-
-        txtLabel.setText("");
+        Intent i = new Intent(MainActivity.this, EditItemsActivity.class);
+        startActivity(i);
     }
 }
