@@ -31,17 +31,15 @@ public class MainActivity extends Activity {
         txtLabel = (EditText) findViewById(R.id.txtLabel);
 
         readItems();
-        handleExtras();
 
         lvItems.setAdapter(todoAdapter);
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) todoAdapter.getItem(position);
-                String todoId = cursor.getString(cursor.getColumnIndex("_id"));
+                Todo todo = todoAdapter.getItem(position);
 
-                //TODO: Convert to Sugar ORM
-                //db.delete(TBL_TODO, "_id=" + todoId, null);
+                todo.delete();
+                todoAdapter.notifyDataSetChanged();
 
                 readItems();
                 return true;
@@ -51,13 +49,10 @@ public class MainActivity extends Activity {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) todoAdapter.getItem(position);
-                String todoId = cursor.getString(cursor.getColumnIndex("_id"));
-                String todoLabel = cursor.getString(cursor.getColumnIndex("Label"));
+                Todo todo = todoAdapter.getItem(position);
 
                 Bundle bundle = new Bundle();
-                bundle.putString("todoId", todoId);
-                bundle.putString("todoLabel", todoLabel);
+                bundle.putLong("todoId", todo.getId());
 
                 Intent i = new Intent(MainActivity.this, EditItemsActivity.class);
                 i.putExtras(bundle);
@@ -67,22 +62,8 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void handleExtras() {
-        Bundle bundle = getIntent().getExtras();
-
-        if (bundle != null) {
-            String todoLabel = bundle.getString("todoLabel");
-            String todoId = bundle.getString("todoId");
-            ContentValues values = new ContentValues();
-            values.put("Label", todoLabel);
-
-            //TODO: Convert to Sugar ORM
-            //db.update(TBL_TODO, values, "_id=" + todoId, null);
-            readItems();
-        }
-    }
-
     private void readItems() {
+        todoAdapter.notifyDataSetChanged();
         todoAdapter.setData(Todo.listAll(Todo.class));
     }
 

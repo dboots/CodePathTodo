@@ -7,32 +7,31 @@ import android.view.View;
 import android.widget.EditText;
 
 public class EditItemsActivity extends Activity {
-    String todoLabel;
-    String todoId;
-    EditText txtLabel;
+    Todo mTodo;
+    long mTodoId;
+    EditText mTxtLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_items);
 
-        txtLabel = (EditText) findViewById(R.id.txtLabel);
+        mTxtLabel = (EditText) findViewById(R.id.txtLabel);
 
         Bundle bundle = getIntent().getExtras();
-        todoLabel = bundle.getString("todoLabel");
-        todoId = bundle.getString("todoId");
+        mTodoId = bundle.getLong("todoId");
+        mTodo = Todo.findById(Todo.class, mTodoId);
 
-        txtLabel.setText(todoLabel);
+        mTxtLabel.setText(mTodo.label);
     }
 
     public void onSave(View view) {
-        Bundle bundle = new Bundle();
-        bundle.putString("todoLabel", txtLabel.getText().toString());
-        bundle.putString("todoId", todoId);
+        mTodo.label = mTxtLabel.getText().toString();
+        mTodo.save();
 
         Intent i = new Intent(EditItemsActivity.this, MainActivity.class);
-        i.putExtras(bundle);
         startActivityForResult(i, 99);
+
         finish();
     }
 }
