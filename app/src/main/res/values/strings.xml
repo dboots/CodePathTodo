@@ -3,4 +3,5 @@
     <string name="add">Add New Todo</string>
     <string name="add_item_label">Add a New Todo</string>
     <string name="add_item_date">Todo Date</string>
+    <string name="add_item_cancel">Cancel</string>
 </resources>

@@ -1,27 +1,30 @@
 package com.donboots.codepathtodo;
 
-import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 
-public class MainActivity extends Activity {
+
+public class MainActivity extends FragmentActivity implements EditFragment.EditNameDialogListener {
     ListView lvItems;
     TodoAdapter todoAdapter;
+    FragmentManager fm;
+    EditFragment editDialog;
 
-    //-- PreferenceManager to get/set FIRST_RUN bool
-    SharedPreferences prefs;
+    @Override
+    public void onFinishEditDialog(Todo todo) {
+        readItems();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fm = getSupportFragmentManager();
 
         todoAdapter = new TodoAdapter(this);
         lvItems = (ListView) findViewById(R.id.lvItems);
@@ -33,10 +36,7 @@ public class MainActivity extends Activity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Todo todo = todoAdapter.getItem(position);
-
                 todo.delete();
-                todoAdapter.notifyDataSetChanged();
-
                 readItems();
                 return true;
             };
@@ -47,13 +47,13 @@ public class MainActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Todo todo = todoAdapter.getItem(position);
 
+                editDialog = new EditFragment();
+
                 Bundle bundle = new Bundle();
                 bundle.putLong("todoId", todo.getId());
 
-                Intent i = new Intent(MainActivity.this, EditItemsActivity.class);
-                i.putExtras(bundle);
-
-                startActivity(i);
+                editDialog.setArguments(bundle);
+                editDialog.show(fm, "activity_edit_items");
             };
         });
     }
@@ -64,7 +64,9 @@ public class MainActivity extends Activity {
     }
 
     public void onAddItem(View view) {
-        Intent i = new Intent(MainActivity.this, EditItemsActivity.class);
-        startActivity(i);
+        editDialog = new EditFragment();
+        editDialog.show(fm, "activity_edit_items");
     }
+
+
 }
