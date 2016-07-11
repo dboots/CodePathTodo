@@ -1,7 +1,7 @@
 package com.donboots.codepathtodo;
 
-import android.content.ClipData;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +50,15 @@ public class TodoAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+
+        SwipeDetector swipeDetector = new SwipeDetector();
+        convertView.setOnTouchListener(swipeDetector);
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("convertView", "I am here");
+            }
+        });
 
         Todo todo = getItem(position);
 
