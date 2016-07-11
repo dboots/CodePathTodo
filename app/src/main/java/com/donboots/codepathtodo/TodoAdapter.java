@@ -1,6 +1,5 @@
 package com.donboots.codepathtodo;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +54,7 @@ public class TodoAdapter extends BaseAdapter {
 
         holder.label.setText(todo.label);
         holder.date.setText(todo.date);
+        holder.sort.setText(Integer.toString(todo.sort));
 
         return convertView;
     }
@@ -62,10 +62,12 @@ public class TodoAdapter extends BaseAdapter {
     private class ViewHolder {
         TextView label;
         TextView date;
+        TextView sort;
 
         public ViewHolder(View view) {
-            label = (TextView) view.findViewById(R.id.etLabel);
-            date = (TextView) view.findViewById(R.id.etDate);
+            label = (TextView) view.findViewById(R.id.tvLabel);
+            date = (TextView) view.findViewById(R.id.tvDate);
+            sort = (TextView) view.findViewById(R.id.tvSort);
         }
 
     }

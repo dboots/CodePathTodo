@@ -7,6 +7,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 
 public class MainActivity extends FragmentActivity implements EditFragment.EditNameDialogListener {
     ListView lvItems;
@@ -59,8 +64,19 @@ public class MainActivity extends FragmentActivity implements EditFragment.EditN
     }
 
     private void readItems() {
+        List<Todo> todos = Todo.listAll(Todo.class);
+
+        Comparator<Todo> todoCompare = new Comparator<Todo>() {
+            @Override
+            public int compare(Todo lhs, Todo rhs) {
+                return lhs.sort - rhs.sort;
+            }
+        };
+
+        Collections.sort(todos, todoCompare);
+
         todoAdapter.notifyDataSetChanged();
-        todoAdapter.setData(Todo.listAll(Todo.class));
+        todoAdapter.setData(todos);
     }
 
     public void onAddItem(View view) {

@@ -4,13 +4,19 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/etLabel"
+        android:id="@+id/tvLabel"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:textSize="15dp"/>
 
     <TextView
-        android:id="@+id/etDate"
+        android:id="@+id/tvDate"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:textSize="11dp"/>
+
+    <TextView
+        android:id="@+id/tvSort"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:textSize="11dp"/>

@@ -11,6 +11,7 @@ import android.widget.EditText;
 public class EditFragment extends DialogFragment {
     private EditText mLabel;
     private EditText mDate;
+    private EditText mSort;
     private Button btnSave;
     private Button btnCancel;
     private long mTodoId;
@@ -28,6 +29,7 @@ public class EditFragment extends DialogFragment {
 
         mLabel = (EditText) view.findViewById(R.id.etLabel);
         mDate = (EditText) view.findViewById(R.id.etDate);
+        mSort = (EditText) view.findViewById(R.id.etSort);
         btnSave = (Button) view.findViewById(R.id.btnSave);
         btnCancel = (Button) view.findViewById(R.id.btnCancel);
 
@@ -37,6 +39,7 @@ public class EditFragment extends DialogFragment {
 
             mLabel.setText(mTodo.label);
             mDate.setText(mTodo.date);
+            mSort.setText(Integer.toString(mTodo.sort));
         }
 
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -51,15 +54,17 @@ public class EditFragment extends DialogFragment {
             public void onClick(View v) {
                 String label = mLabel.getText().toString();
                 String date = mDate.getText().toString();
+                int sort = Integer.parseInt(mSort.getText().toString());
 
                 if (getArguments() != null) {
                     //-- Updating a todo item
                     mTodo.label = label;
                     mTodo.date = date;
+                    mTodo.sort = sort;
                     mTodo.save();
                 } else {
                     //-- Adding a todo item
-                    mTodo = new Todo(label, date);
+                    mTodo = new Todo(label, date, sort);
                     mTodo.save();
                 }
 
